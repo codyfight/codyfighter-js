@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Codyfight | Game Controller</title>
+
+    <!-- jQuery library from https://code.jquery.com/ -->
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+            integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+            crossorigin="anonymous">
+    </script>
+
+    <!-- Codyfight game client script -->
+    <script src="https://client.codyfight.com/lib/client.js"></script>
+
+    <!-- game config -->
+    <script>
+        const DEFAULT_MODE = 2; // {1 - custom, 2 - random, 3 - arena}
+        const DEFAULT_OPPONENT_NAME = null; // used only when played in custom game (mode = 1)
+
+        const GAME_STATUS_ENDED = 2;
+        const GAME_STATUS_PLAYING = 1;
+        const GAME_STATUS_INITIALIZING = 0;
+    </script>
+
+    <!-- [!]  ENTRY POINT: codyfighter script  [!] -->
+    <script>
+        /**
+         * TODO: implement function play()
+         * TODO: develop a sophisticated algorithm to perform your codyfighter movement to the position x, y
+         *
+         * The game goal is to gather more points than the opponent. Points can be earned by
+         *  - going thru exit (check game.map)
+         *  - collaborating with (another robot || special agent) and caging the Pig (check game.special_agents)
+         *
+         * All your available movements: game.robots.bearer.possible_moves
+         */
+
+        async function play (CKey, mode, opponentName = null) {
+
+            // initialize a new game
+            let game = await init(CKey, mode, opponentName);
+
+            // match an opponent
+            while (game.state.status === GAME_STATUS_INITIALIZING) {
+                game = await check(CKey);
+            }
+
+            // play the game
+            while (game.state.status === GAME_STATUS_PLAYING) {
+                try {
+                    if (game.robots.bearer.is_action_required) {
+                        let randomMove = Math.floor(Math.random() * game.robots.bearer.possible_moves.length);
+
+                        let x = game.robots.bearer.possible_moves[randomMove].x;
+                        let y = game.robots.bearer.possible_moves[randomMove].y;
+
+                        game = await move(CKey, x, y);
+                    } else {
+                        game = await check(CKey);
+                    }
+                } catch (error) {
+                    console.warn('Failed to perform a move, checking the game state...', error);
+                    game = await check(CKey);
+                }
+            }
+
+            if (game.state.status === GAME_STATUS_ENDED) {
+                console.log('Game Over!', game.verdict);
+            }
+        }
+    </script>
+
+    <!-- script to embed game widget -->
+    <script>
+        $(document).ready(function () {
+            $('#start-game').on('click', startGame);
+        });
+
+        async function startGame () {
+            let CKey = $('#c-key').val();
+            let widget = $('#game-widget');
+
+            let game = await check(CKey);
+
+            widget.off('load');
+            widget.on('load', async function () {
+                await play(CKey, DEFAULT_MODE, DEFAULT_OPPONENT_NAME);
+            });
+            widget.attr('src', 'https://widget.codyfight.com/?robot=' + game.robots.bearer.name);
+        }
+    </script>
+
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <style>
+        .src {
+            font-family: "Courier New", cursive;
+        }
+
+        .title {
+            text-align: center;
+        }
+
+        .container {
+            margin: 25px;
+        }
+
+        .footer {
+            text-align: center;
+        }
+
+        .separator {
+            margin: 30px 0 30px 0;
+        }
+
+        .button {
+            width: 100px;
+            padding: 5px;
+        }
+
+        a {
+            color: #7288B3;
+            text-decoration: none;
+            outline: 0;
+        }
+
+        a:hover {
+            color: #1d68a7;
+            text-decoration: none;
+            outline: 0;
+        }
+
+        input {
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2 class="title src">Codyfight Game Controller</h2>
+
+    <hr class="separator" />
+    <div>
+        <label for="c-key" class="src" style="display: block; margin-bottom: 10px">
+            Input here your Codyfighter identification key to start a new game in random mode
+        </label>
+        <input id="c-key" name="player" type="text" placeholder="CKey" />
+        <button id="start-game" class="button src">Play</button>
+    </div>
+
+    <hr class="separator" />
+    <h3>Quick Start</h3>
+    <label>To inspire intelligence for your Codyfighter, develop a program that controls movement decisions via Codyfight Game API.</label>
+    <ul>
+        <li>Read more in the <a href="https://www.codyfight.com/api" target="_blank">API documentation</a></li>
+        <li>
+            Visit Codyfight game client
+            <a href="https://github.com/codyfight/js-client" target="_blank">GitHub Repository</a>
+        </li>
+    </ul>
+
+    <hr class="separator" />
+    <embed type="text/html" id="game-widget" src="" style="width:50%; height:100vh;" />
+
+    <hr class="separator" />
+    <div class="footer">
+        <label>&#169; <a href="https://www.codyfight.com" target="_blank">Codyfight</a> - all rights reserved</label>
+    </div>
+</div>
+</body>
+</html>
