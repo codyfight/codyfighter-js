@@ -13,16 +13,6 @@
     <!-- Codyfight game client script -->
     <script src="https://client.codyfight.com/lib/client.js"></script>
 
-    <!-- game config -->
-    <script>
-        const DEFAULT_MODE = 2; // {1 - custom, 2 - random, 3 - arena}
-        const DEFAULT_OPPONENT_NAME = null; // used only when played in custom game (mode = 1)
-
-        const GAME_STATUS_ENDED = 2;
-        const GAME_STATUS_PLAYING = 1;
-        const GAME_STATUS_INITIALIZING = 0;
-    </script>
-
     <!-- [!]  ENTRY POINT: codyfighter script  [!] -->
     <script>
         /**
@@ -35,13 +25,14 @@
          *
          * All your available movements: game.robots.bearer.possible_moves
          */
+        const API_KEY = '****'; // TODO: enter API key of your CKey (visit dashboard at www.codyfight.com)
 
         async function play (CKey, mode, opponentName = null) {
 
             // initialize a new game
             let game = await init(CKey, mode, opponentName);
 
-            // match an opponent
+            // wait an opponent match
             while (game.state.status === GAME_STATUS_INITIALIZING) {
                 game = await check(CKey);
             }
@@ -50,8 +41,8 @@
             while (game.state.status === GAME_STATUS_PLAYING) {
                 try {
                     if (game.robots.bearer.is_action_required) {
+                        // TODO: implement smart solution here instead of random movement
                         let randomMove = Math.floor(Math.random() * game.robots.bearer.possible_moves.length);
-
                         let x = game.robots.bearer.possible_moves[randomMove].x;
                         let y = game.robots.bearer.possible_moves[randomMove].y;
 
@@ -69,6 +60,10 @@
                 console.log('Game Over!', game.verdict);
             }
         }
+
+        const GAME_STATUS_ENDED = 2;
+        const GAME_STATUS_PLAYING = 1;
+        const GAME_STATUS_INITIALIZING = 0;
     </script>
 
     <!-- script to embed game widget -->
@@ -78,14 +73,15 @@
         });
 
         async function startGame () {
-            let CKey = $('#c-key').val();
+            let mode = $('#game-mode').val();
+            let opponentName = $('#opponent-name').val();
             let widget = $('#game-widget');
 
-            let game = await check(CKey);
+            let game = await check(API_KEY);
 
             widget.off('load');
             widget.on('load', async function () {
-                await play(CKey, DEFAULT_MODE, DEFAULT_OPPONENT_NAME);
+                await play(API_KEY, mode, opponentName);
             });
             widget.attr('src', 'https://widget.codyfight.com/?robot=' + game.robots.bearer.name);
         }
@@ -114,7 +110,7 @@
         }
 
         .button {
-            width: 100px;
+            width: 150px;
             padding: 5px;
         }
 
@@ -131,8 +127,13 @@
         }
 
         input {
-            margin: 5px;
-            padding: 5px;
+            width: 150px;
+            height: 25px;
+        }
+
+        select, option {
+            width: 150px;
+            height: 30px;
         }
     </style>
 </head>
@@ -143,11 +144,21 @@
 
     <hr class="separator" />
     <div>
-        <label for="c-key" class="src" style="display: block; margin-bottom: 10px">
-            Input here your Codyfighter identification key to start a new game in random mode
+        <label class="src" style="display: block; margin-bottom: 10px">
+            Start a new game...
         </label>
-        <input id="c-key" name="player" type="text" placeholder="CKey" />
-        <button id="start-game" class="button src">Play</button>
+
+        <select id="game-mode">
+            <option selected disabled>Game Mode</option>
+            <option value="1">Custom</option>
+            <option value="2">Random</option>
+            <option value="3">Arena</option>
+        </select>
+
+        <input id="opponent-name" type="text" placeholder="Opponent name" style="margin-left: 10px;" />
+
+        <br>
+        <button id="start-game" class="button src" style="margin-top: 10px;">Play</button>
     </div>
 
     <hr class="separator" />
@@ -162,7 +173,9 @@
     </ul>
 
     <hr class="separator" />
-    <embed type="text/html" id="game-widget" src="" style="width:50%; height:100vh;" />
+    <div style="text-align: center;">
+        <embed type="text/html" id="game-widget" src="" style="width:50%; height:100vh;" />
+    </div>
 
     <hr class="separator" />
     <div class="footer">
