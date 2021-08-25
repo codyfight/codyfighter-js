@@ -17,15 +17,17 @@
     <script>
         /**
          * TODO: implement function play()
-         * TODO: develop a sophisticated algorithm to perform your codyfighter movement to the position x, y
+         * TODO: develop a sophisticated algorithm to perform your robot movement to the position x, y
+         *
+         * `var game` is a response from game API (refer to https://codyfight.com/api)
          *
          * The game goal is to gather more points than the opponent. Points can be earned by
-         *  - going thru exit (check game.map)
+         *  - taking an exit (check game.map)
          *  - collaborating with (another robot || special agent) and caging the Pig (check game.special_agents)
          *
          * All your available movements: game.robots.bearer.possible_moves
          */
-        const API_KEY = '****'; // TODO: enter API key of your CKey (visit dashboard at www.codyfight.com)
+        const CKEY = '****'; // TODO: enter your CKey (visit dashboard at www.codyfight.com)
 
         async function play (CKey, mode, opponentName = null) {
 
@@ -77,11 +79,11 @@
             let opponentName = $('#opponent-name').val();
             let widget = $('#game-widget');
 
-            let game = await check(API_KEY);
+            let game = await check(CKEY);
 
             widget.off('load');
             widget.on('load', async function () {
-                await play(API_KEY, mode, opponentName);
+                await play(CKEY, mode, opponentName);
             });
             widget.attr('src', 'https://widget.codyfight.com/?robot=' + game.robots.bearer.name);
         }
