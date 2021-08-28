@@ -27,7 +27,7 @@
          *
          * All your available movements: game.robots.bearer.possible_moves
          */
-        const CKEY = '****'; // TODO: enter your CKey (visit dashboard at www.codyfight.com)
+        const YOUR_ROBOT_CKEY = '****'; // TODO: enter your codyfighter CKey (visit dashboard: https://www.codyfight.com/auth/dashboard)
 
         async function play (CKey, mode, opponentName = null) {
 
@@ -75,15 +75,15 @@
         });
 
         async function startGame () {
-            let mode = $('#game-mode').val();
-            let opponentName = $('#opponent-name').val();
-            let widget = $('#game-widget');
+            const mode = $('#game-mode').val();
+            const opponentName = $('#opponent-name').val();
+            const widget = $('#game-widget');
 
-            let game = await check(CKEY);
+            const game = await check(YOUR_ROBOT_CKEY);
 
             widget.off('load');
             widget.on('load', async function () {
-                await play(CKEY, mode, opponentName);
+                await play(YOUR_ROBOT_CKEY, mode, opponentName);
             });
             widget.attr('src', 'https://widget.codyfight.com/?robot=' + game.robots.bearer.name);
         }
