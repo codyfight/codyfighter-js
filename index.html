@@ -17,17 +17,17 @@
     <script>
         /**
          * TODO: implement function play()
-         * TODO: develop a sophisticated algorithm to perform your robot movement to the position x, y
+         * TODO: develop a sophisticated algorithm to perform your codyfighter movement to the position x, y
          *
-         * `var game` is a response from game API (refer to https://codyfight.com/api)
+         * `var game` is a response from game API (refer to https://codyfight.com/api-doc)
          *
          * The game goal is to gather more points than the opponent. Points can be earned by
          *  - taking an exit (check game.map)
-         *  - collaborating with (another robot || special agent) and caging the Pig (check game.special_agents)
+         *  - collaborating with (another codyfighter || special agent) and caging the Mr. Ryo (check game.special_agents)
          *
-         * All your available movements: game.robots.bearer.possible_moves
+         * All your available movements: game.operators.bearer.possible_moves
          */
-        const YOUR_ROBOT_CKEY = '****'; // TODO: enter your codyfighter CKey (visit dashboard: https://www.codyfight.com/auth/dashboard)
+        const YOUR_OPERATOR_CKEY = '****'; // TODO: enter your codyfighter CKey
 
         async function play (CKey, mode, opponentName = null) {
 
@@ -42,11 +42,11 @@
             // play the game
             while (game.state.status === GAME_STATUS_PLAYING) {
                 try {
-                    if (game.robots.bearer.is_action_required) {
+                    if (game.operators.bearer.is_action_required) {
                         // TODO: implement smart solution here instead of random movement
-                        let randomMove = Math.floor(Math.random() * game.robots.bearer.possible_moves.length);
-                        let x = game.robots.bearer.possible_moves[randomMove].x;
-                        let y = game.robots.bearer.possible_moves[randomMove].y;
+                        let randomMove = Math.floor(Math.random() * game.operators.bearer.possible_moves.length);
+                        let x = game.operators.bearer.possible_moves[randomMove].x;
+                        let y = game.operators.bearer.possible_moves[randomMove].y;
 
                         game = await move(CKey, x, y);
                     } else {
@@ -79,13 +79,13 @@
             const opponentName = $('#opponent-name').val();
             const widget = $('#game-widget');
 
-            const game = await check(YOUR_ROBOT_CKEY);
+            const game = await check(YOUR_OPERATOR_CKEY);
 
             widget.off('load');
             widget.on('load', async function () {
-                await play(YOUR_ROBOT_CKEY, mode, opponentName);
+                await play(YOUR_OPERATOR_CKEY, mode, opponentName);
             });
-            widget.attr('src', 'https://widget.codyfight.com/?robot=' + game.robots.bearer.name);
+            widget.attr('src', 'https://widget.codyfight.com/?operator=' + game.operators.bearer.name);
         }
     </script>
 
