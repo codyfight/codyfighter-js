@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Codyfight | Game Controller</title>
+    <title>Codyfight Game Launcher</title>
 
     <!-- jQuery library from https://code.jquery.com/ -->
     <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
@@ -27,8 +27,6 @@
          *
          * All your available movements: game.operators.bearer.possible_moves
          */
-        const YOUR_OPERATOR_CKEY = '****'; // TODO: enter your codyfighter CKey
-
         async function play (CKey, mode, opponentName = null) {
 
             // initialize a new game
@@ -75,21 +73,21 @@
         });
 
         async function startGame () {
+            const CKey = $('#ckey').val();
             const mode = $('#game-mode').val();
             const opponentName = $('#opponent-name').val();
             const widget = $('#game-widget');
 
-            const game = await check(YOUR_OPERATOR_CKEY);
+            const game = await check(CKey);
 
             widget.off('load');
             widget.on('load', async function () {
-                await play(YOUR_OPERATOR_CKEY, mode, opponentName);
+                await play(CKey, mode, opponentName);
             });
             widget.attr('src', 'https://widget.codyfight.com/?operator=' + game.operators.bearer.name);
         }
     </script>
 
-    <link rel="icon" type="image/png" href="https://codyfight.com/favicon.ico">
     <style>
         .src {
             font-family: "Courier New", cursive;
@@ -100,7 +98,7 @@
         }
 
         .button {
-            width: 150px;
+            width: 158px;
             padding: 5px;
         }
 
@@ -122,7 +120,7 @@
         }
 
         select, option {
-            width: 150px;
+            width: 158px;
             height: 30px;
         }
     </style>
@@ -130,7 +128,7 @@
 
 <body>
 <div style="margin: 25px">
-    <h2 class="src" style="text-align: center">Codyfight Game Controller</h2>
+    <h2 class="src" style="text-align: center">Codyfight Game Launcher</h2>
 
     <hr class="separator" />
     <div>
@@ -139,33 +137,42 @@
         </label>
 
         <select id="game-mode">
-            <option selected disabled>Game Mode</option>
+            <option disabled>Game Mode</option>
             <option value="1">Custom</option>
-            <option value="2">Random</option>
+            <option value="2" selected>Random</option>
             <option value="3">Arena</option>
         </select>
 
-        <input id="opponent-name" type="text" placeholder="Opponent name" style="margin-left: 10px;" />
+        <input id="opponent-name" type="text" placeholder="Opponent name (used in custom mode)" style="margin-left: 10px; width: 250px" />
+
+        <br>
+        <br>
+        <input id="ckey" type="text" placeholder="CKey" />
 
         <br>
         <button id="start-game" class="button src" style="margin-top: 10px;">Play</button>
     </div>
 
     <hr class="separator" />
-    <h3>Quick Start</h3>
-    <label>To inspire intelligence for your Codyfighter, develop a program that controls movement decisions via Codyfight Game API.</label>
-    <ul>
-        <li>Read more in the <a href="https://www.codyfight.com/api" target="_blank">API documentation</a></li>
-        <li>
-            Visit Codyfight game client
-            <a href="https://github.com/codyfight/js-client" target="_blank">GitHub Repository</a>
-        </li>
-    </ul>
-
-    <hr class="separator" />
     <div style="text-align: center;">
         <embed type="text/html" id="game-widget" src="" style="width:50%; height:100vh;" />
     </div>
+
+    <hr class="separator" />
+    <h3>Quick Start</h3>
+    <p>
+        To inspire intelligence for your Codyfighter, develop a program that controls movement decisions via Codyfight Game <a href="https://www.codyfight.com/api-doc" target="_blank">API</a>.
+        <br>
+        Implement <span class="src">play()</span> function in <span class="src">index.html</span> file (within <span class="src">&lt;script&gt;</span> tag).
+    </label>
+    <ul>
+        <li>
+            Official <a href="https://codyfight.com/" target="_blank">website</a>
+        </li>
+        <li>
+            Official Codyfight <a href="https://github.com/codyfight/" target="_blank">GitHub</a>
+        </li>
+    </ul>
 
     <hr class="separator" />
     <div style="text-align: center">
